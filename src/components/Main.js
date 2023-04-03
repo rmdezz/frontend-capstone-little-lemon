@@ -4,6 +4,7 @@ import Specials from "./Specials/Specials";
 import Testimonials from "./Testimonials/Testimonials";
 import About from "./About/About";
 import Homepage from "./Homepage";
+import BookingPage from "./Booking/BookingPage";
 import {Routes, Route} from "react-router-dom";
 
 function Main() {
@@ -15,6 +16,7 @@ function Main() {
                 <Route path="/specials" element={<Specials/>}/>
                 <Route path="/testimonials" element={<Testimonials/>}/>
                 <Route path="/about" element={<About/>}/>
+                <Route path="/booking" element={<BookingPage/>}/>
             </Routes>
         </main>
     )
