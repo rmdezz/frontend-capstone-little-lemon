@@ -1,8 +1,9 @@
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useState } from "react";
 import BookingForm from "./BookingForm";
 import "./BookingPage.css";
-import { fetchAPI } from "../../utils/fetchAPI";
-
+import { fetchAPI, submitAPI } from "../../utils/fetchAPI";
+import { useNavigate } from "react-router-dom";
+import ConfirmedBooking from "./ConfirmedBooking";
 /* It is a good practice to separate the reducer functions from
     the component that uses them. For example, if you have
     another component that needs to use the same 'updateTimes'
@@ -17,7 +18,7 @@ import { fetchAPI } from "../../utils/fetchAPI";
 
 const initializeTimes = initialTimes => [...initialTimes, ...fetchAPI(new Date())]; */
 
-function availableTimesReducer(state, action) {
+export function availableTimesReducer(state, action) {
     switch (action.type) {
         case 'UPDATE_TIMES':
             const response = fetchAPI(new Date(action.date));
@@ -31,24 +32,42 @@ function availableTimesReducer(state, action) {
 }
 
 function BookingPage() {
+    /* const navigate = useNavigate(); */
+
     /* const [availableTimes, dispatchTimes] = useReducer(updateTimes, [], initializeTimes); */
     const [availableTimes, dispatchTimes] = useReducer(availableTimesReducer, []);
-
-    const initializeTimes = (initialTimes) => {
-        dispatchTimes({type: 'INITIALIZE_TIMES', initialTimes});
-    }
+    const [formData, setFormData] = useState({
+        date: "",
+        time: "",
+        guests: "1",
+        occasion: ""
+    });
+    const [bookingConfirmed, setBookingConfirmed] = useState(false);
 
     useEffect(() => {
-        initializeTimes([]);
-    }, []);
+        dispatchTimes({ type: 'INITIALIZE_TIMES', initialTimes: [] });
+      }, []);
 
+    const submitData = formData => {
+        const response = submitAPI(formData);
+        if (response) {
+            /* navigate(`/booking-confirmed/${formData.date}/${formData.time}/${formData.guests}`); */
+            setBookingConfirmed(true);
+        }
+    }
 
     return (
         <section className="booking-section">
-            <h2 className="booking-heading">Table a reservation</h2>
-            <BookingForm
-                availableTimes={availableTimes}
-                dispatchTimes={dispatchTimes}/>
+            {bookingConfirmed ? <ConfirmedBooking data={formData}/> :
+            <>
+                <h2 className="booking-heading">Table a reservation</h2>
+                <BookingForm
+                    availableTimes={availableTimes}
+                    dispatchTimes={dispatchTimes}
+                    formData={formData}
+                    setFormData={setFormData}
+                    submitData={submitData}/>
+            </>}
         </section>
     );
 }
