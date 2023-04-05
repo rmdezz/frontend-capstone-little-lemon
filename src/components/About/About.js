@@ -5,11 +5,11 @@ import "./About.css";
 
 function About() {
     return (
-        <section className="about">
+        <section className="about" aria-labelledby="about-title">
             <div className="about-container">
                 <div className="about-text">
                     <div className="about-header">
-                        <h2>Little Lemon</h2>
+                        <h2 id="about-title" className="visually-hidden">Little Lemon</h2>
                         <h3>Chicago</h3>
                     </div>
                     <div className="about-content">
@@ -24,7 +24,6 @@ function About() {
                 </div>
                 <div className="about-images">
                     <img src={image1} alt="Mario and Adrian A"/>
-                    {/* <p>hOLA</p> */}
                     <img src={image2} alt="Mario and Adrian B"/>
                 </div>
             </div>

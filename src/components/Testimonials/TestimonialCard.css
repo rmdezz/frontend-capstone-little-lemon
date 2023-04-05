@@ -1,0 +1,23 @@
+.review-text {
+    /* background-color:#19c298 ; */
+    height: 100px;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+    margin: 16px 0px;
+}
+
+.rating {
+    /* background-color: aqua; */
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.star {
+    color: #F4CE14;
+    font-size: 2rem;
+    margin-right: 10px;
+}

@@ -7,7 +7,7 @@ function Header() {
     return (
         <header className='header'>
             <div className='header__container'>
-                <img src={logo} alt="Little Lemon Logo"/>
+                <img src={logo} alt="Little Lemon Logo" aria-label='Little Lemon Logo'/>
                 <Nav/>
             </div>
         </header>

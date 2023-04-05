@@ -17,9 +17,9 @@ const ConfirmedBooking = ({data}) => {
                     <div className="confirmed-booking-details">
                         <p className="confirmed-booking-message">Your booking for:</p>
                         <ul className="confirmed-booking-list">
-                            <li><span className="confirmed-booking-label">Date:</span> {data.date}</li>
-                            <li><span className="confirmed-booking-label">Time:</span> {data.time}</li>
-                            <li><span className="confirmed-booking-label">Guests:</span> {data.guests}</li>
+                            <li className="confirmed-booking-data"><span className="confirmed-booking-label">Date:</span> {data.date}</li>
+                            <li className="confirmed-booking-data"><span className="confirmed-booking-label">Time:</span> {data.time}</li>
+                            <li className="confirmed-booking-data"><span className="confirmed-booking-label">Guests:</span> {data.guests}</li>
                         </ul>
                     </div>
                 </div>

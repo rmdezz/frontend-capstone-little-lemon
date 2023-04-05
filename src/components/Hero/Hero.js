@@ -11,11 +11,11 @@ function Hero() {
                         <h1>Little Lemon</h1>
                         <h2>Chicago</h2>
                         <p>We are a family owned Mediterranean restaurant, focused on traditional recipes served with a modern twist.</p>
-                        <button className='btn-reserve'>Reserve a table</button>
+                        <button className='btn-reserve' aria-label='Reserve a table'>Reserve a table</button>
                     </div>
                     <div className='hero-image'>
                         {/* <img src={hero} alt="Little Lemon Restaurant" style={{maxWidth: "50%", height: "auto"}}/> */}
-                        <img src={hero} alt="Little Lemon Restaurant"/>
+                        <img src={hero} alt="Little Lemon Restaurant" aria-label='Little Lemon Restaurant'/>
                     </div>
                 </div>
             </div>

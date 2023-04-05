@@ -3,7 +3,7 @@ import BookingPage from "./BookingPage";
 import BookingForm from "./BookingForm";
 import {initializeTimes, updateTimes} from "./BookingForm";
 import { fetchAPI } from "../../utils/fetchAPI";
-import { useReducer, useEffect } from "react";
+import { useReducer, useEffect, useState } from "react";
 import { renderHook } from '@testing-library/react';
 import { availableTimesReducer } from "./BookingPage";
 import { act } from 'react-dom/test-utils';
@@ -19,69 +19,149 @@ test('initializeTimes returns a non-empty array', () => {
     expect(timesArray.length).toBeGreaterThan(0);
 });
 
+function BookingFormWrapper(props) {
+    const [formData, setFormData] = useState({
+      date: '',
+      time: '',
+      guests: '',
+      occasion: '',
+    });
 
-/* test('dispatching an update action should update the available times', () => {
-    const initialArray = [];
-    const testDate = new Date('2022-05-01');
-    const updatedArray = fetchAPI(testDate);
-    console.log('test:', updatedArray);
-    const { result } = renderHook(() => useReducer(availableTimesReducer, initialArray));
-    const [availableTimes, dispatchTimes] = result.current;
+    return (
+      <BookingForm
+        formData={formData}
+        setFormData={setFormData}
+        {...props}
+      />
+    );
+}
 
-    const { getByLabelText, getAllByTestId } = render(<BookingForm
-      availableTimes={availableTimes}
-      dispatchTimes={dispatchTimes}
-      formData={{ date: '', time: '', guests: '1', occasion: '' }}
-      setFormData={jest.fn()}
-      submitData={jest.fn()}
-    />);
+function BookingFormWrapperWithAvailableTimes(props) {
+    const [formData, setFormData] = useState({
+      date: '',
+      time: '',
+      guests: '',
+      occasion: '',
+    });
 
-    // initialize the availableTimes state
+    const [availableTimes, dispatchTimes] = useReducer(availableTimesReducer, []);
     useEffect(() => {
-        dispatchTimes({ type: 'INITIALIZE_TIMES', initialTimes: [] });
+            dispatchTimes({ type: 'INITIALIZE_TIMES', initialTimes: [] });
     }, []);
 
-    // Get the options from the rest-time select element
-    const restTimeSelect = getByLabelText('Choose time');
-    const initialOptions = getAllByTestId('res-time').map(option => option.value);
+    return (
+      <BookingForm
+        formData={formData}
+        setFormData={setFormData}
+        availableTimes={availableTimes}
+        dispatchTimes={dispatchTimes}
+        {...props}
+      />
+    );
+}
 
-    console.log("init:", initialOptions);
+describe('BookingForm - Form validation', () => {
+    test('HTML5 validation is applied to the date input field', () => {
+        render(<BookingFormWrapper/>);
+        const input = screen.getByLabelText('Choose date');
+        expect(input).toHaveAttribute('type', 'date');
+        expect(input).toHaveAttribute('id', 'date');
+        expect(input).toHaveAttribute('required');
+    });
 
-    // Change the date and get the new options from the rest-time select element
-    fireEvent.change(getByLabelText('Choose date'), { target: { value: '2022-05-01' } });
-    const updatedOptions = getAllByTestId('res-time').map(option => option.value);
+    test('HTML5 validation is applied to the time select field', () => {
+        render(<BookingFormWrapper/>);
+        const select = screen.getByTestId('time');
+        expect(select).toHaveAttribute('required');
+    });
 
-    console.log("updated:", updatedOptions);
+    test('HTML5 validation is applied to the number of guests input field', () => {
+        render(<BookingFormWrapper/>);
+        const input = screen.getByLabelText('Number of guests');
+        expect(input).toHaveAttribute('required');
+        expect(input).toHaveAttribute('min', '1');
+        expect(input).toHaveAttribute('max', '10');
+    });
 
-    // Compare the options before and after changing the date
-    expect(initialOptions).not.toEqual(updatedOptions);
-  }); */
+    test('HTML5 validation is applied to the occasion select field', () => {
+        render(<BookingFormWrapper/>);
+        const select = screen.getByLabelText('Occasion');
+        expect(select).toHaveAttribute('required');
+    });
 
+    test('Should display validation errors when form fields are invalid and the user has focused away from the field', () => {
+        render(<BookingFormWrapper/>);
+        const dateInput = screen.getByLabelText('Choose date');
+        const timeSelect = screen.getByTestId('time');
+        const guestsInput = screen.getByLabelText('Number of guests');
+        const occasionSelect = screen.getByLabelText('Occasion');
 
+        fireEvent.blur(dateInput);
+        expect(screen.getByText('Please select a date')).toBeInTheDocument();
 
-/* test('initializeTimes returns the correct initial times array', () => {
-    const expectedArray = [
-        { time: '17:00', isBooked: false},
-        { time: '18:00', isBooked: false },
-        { time: '19:00', isBooked: false },
-        { time: '20:00', isBooked: false },
-        { time: '21:00', isBooked: false },
-        { time: '22:00', isBooked: false },
-    ];
-    expect(initializeTimes()).toEqual(expectedArray);
+        fireEvent.blur(timeSelect);
+        expect(screen.getByText('Please select a time')).toBeInTheDocument();
+
+        fireEvent.blur(guestsInput);
+        expect(screen.getByText('Please enter the number of guests')).toBeInTheDocument();
+
+        fireEvent.blur(occasionSelect);
+        expect(screen.getByText('Please select an occasion')).toBeInTheDocument();
+    });
+
+    test('Should not display validation errors for fields that are valid', () => {
+        render(<BookingFormWrapperWithAvailableTimes/>);
+        const dateInput = screen.getByLabelText('Choose date');
+        const timeSelect = screen.getByTestId('time');
+        const guestsInput = screen.getByLabelText('Number of guests');
+        const occasionSelect = screen.getByLabelText('Occasion');
+
+        fireEvent.change(dateInput, {target: {value: '2022-01-01'}});
+        fireEvent.blur(dateInput);
+        expect(screen.queryByText('Please select a date')).not.toBeInTheDocument();
+
+        fireEvent.change(timeSelect, {target: {value: '17:00'}});
+        fireEvent.blur(timeSelect);
+        expect(screen.queryByText('Please select a time')).not.toBeInTheDocument();
+
+        fireEvent.change(guestsInput, {target: {value: '5'}});
+        fireEvent.blur(guestsInput);
+        expect(screen.queryByText('Please enter the number of guests')).not.toBeInTheDocument();
+
+        fireEvent.change(occasionSelect, {target: {value: 'Birthday'}});
+        fireEvent.blur(occasionSelect);
+        expect(screen.queryByText('Please select an occasion')).not.toBeInTheDocument();
+    });
+
+    test('Should display an error message when the number of guests is less than 1', () => {
+        render(<BookingFormWrapperWithAvailableTimes/>);
+        const guestsInput = screen.getByLabelText('Number of guests');
+        fireEvent.change(guestsInput, {target: {value: '0'}});
+        fireEvent.blur(guestsInput);
+        expect(screen.getByText('Please enter a number between 1 and 10')).toBeInTheDocument();
+    });
+
+    test('Should display an error message when the number of guests is greater than 10', () => {
+        render(<BookingFormWrapperWithAvailableTimes/>);
+        const guestsInput = screen.getByLabelText('Number of guests');
+        fireEvent.change(guestsInput, {target: {value: '11'}});
+        fireEvent.blur(guestsInput);
+        expect(screen.getByText('Please enter a number between 1 and 10')).toBeInTheDocument();
+    });
 });
 
-test('updateTimes returns the same array when no date is provided', () => {
-    const initialArray = [
-        { time: '17:00', isBooked: false},
-        { time: '18:00', isBooked: false },
-        { time: '19:00', isBooked: false },
-        { time: '20:00', isBooked: false },
-        { time: '21:00', isBooked: false },
-        { time: '22:00', isBooked: false },
-    ];
-    expect(updateTimes()).toEqual(initialArray);
+describe('BookingForm - Form submision', () => {
+    test('Should call submitData function with form data when form is submitted', () => {
+        const mockSubmitData = jest.fn();
+        const formData = {
+            date: '2022-01-01',
+            time: '17:00',
+            guests: '5',
+            occasion: 'Birthday',
+        };
+        render(<BookingForm formData={formData} submitData={mockSubmitData}/>);
+        const submitButton = screen.getByRole('button', {name: /make your reservation/i});
+        fireEvent.click(submitButton);
+        expect(mockSubmitData).toHaveBeenCalledWith(formData);
+    });
 });
- */
-
-

@@ -46,7 +46,7 @@ function BookingPage() {
 
     useEffect(() => {
         dispatchTimes({ type: 'INITIALIZE_TIMES', initialTimes: [] });
-      }, []);
+    }, []);
 
     const submitData = formData => {
         const response = submitAPI(formData);
