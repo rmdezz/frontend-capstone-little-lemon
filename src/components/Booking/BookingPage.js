@@ -48,6 +48,12 @@ function BookingPage() {
         dispatchTimes({ type: 'INITIALIZE_TIMES', initialTimes: [] });
     }, []);
 
+    useEffect(() => {
+        if (availableTimes.length > 0) {
+            setFormData((prevState) => ({ ...prevState, time: availableTimes[0] }));
+        }
+    }, [availableTimes]);
+
     const submitData = formData => {
         const response = submitAPI(formData);
         if (response) {

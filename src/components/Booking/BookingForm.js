@@ -28,6 +28,13 @@ function BookingForm({availableTimes, dispatchTimes, formData, setFormData, subm
         occasion: false,
     });
 
+    const [isFormValid, setIsFormValid] = useState(false);
+
+    const updateFormValidity = () => {
+        const isValid = !Object.values(formErrors).some((error) => error !== "");
+        setIsFormValid(isValid);
+    };
+
     const validateDate = () => {
         const errors = {};
         if (!formData.date) {
@@ -36,6 +43,7 @@ function BookingForm({availableTimes, dispatchTimes, formData, setFormData, subm
             errors.date = "";
         }
         setFormErrors((prevState) => ({...prevState, ...errors}));
+        updateFormValidity();
     }
 
     const validateTime = () => {
@@ -46,6 +54,7 @@ function BookingForm({availableTimes, dispatchTimes, formData, setFormData, subm
             errors.time = "";
         }
         setFormErrors((prevState) => ({...prevState, ...errors}));
+        updateFormValidity();
     }
 
     const validateGuests = () => {
@@ -58,6 +67,7 @@ function BookingForm({availableTimes, dispatchTimes, formData, setFormData, subm
             errors.guests = "";
         }
         setFormErrors((prevState) => ({...prevState, ...errors}));
+        updateFormValidity();
     }
 
     const validateOccasion = () => {
@@ -68,6 +78,7 @@ function BookingForm({availableTimes, dispatchTimes, formData, setFormData, subm
             errors.occasion = "";
         }
         setFormErrors((prevState) => ({...prevState, ...errors}));
+        updateFormValidity();
     }
 
     const handleBlur = (e) => {
@@ -87,7 +98,7 @@ function BookingForm({availableTimes, dispatchTimes, formData, setFormData, subm
                 break;
             default:
                 break;
-        }
+        };
     }
 
     const handleDateChange = (e) => {
@@ -95,20 +106,24 @@ function BookingForm({availableTimes, dispatchTimes, formData, setFormData, subm
         /* setDate(e.target.value); */
         /* dispatchTimes(e.target.value); */
         dispatchTimes({type: 'UPDATE_TIMES', date: formData.date});
+        updateFormValidity();
     };
 
     const handleTimeChange = (e) => {
         setFormData({...formData, time: e.target.value});
+        updateFormValidity();
         /* setTime(e.target.value); */
     };
 
     const handleGuestsChange = (e) => {
         setFormData({...formData, guests: e.target.value});
+        updateFormValidity();
         /* setGuests(e.target.value); */
     };
 
     const handleOccasionChange = (e) => {
         setFormData({...formData, occasion: e.target.value});
+        updateFormValidity();
         /* setOccasion(e.target.value); */
     }
 
@@ -144,7 +159,7 @@ function BookingForm({availableTimes, dispatchTimes, formData, setFormData, subm
             </select>
             {isBlurred.occasion && formErrors.occasion && <div id="occasion-error" className="error">{formErrors.occasion}</div>}
 
-            <input className="btn-submit" id="btn-submit" type="submit" value="Make your reservation"/>
+            <input className="btn-submit" id="btn-submit" type="submit" value="Make your reservation" disabled={!isFormValid}/>
         </form>
     );
 }
